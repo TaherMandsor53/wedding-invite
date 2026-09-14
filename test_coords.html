@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Exact Alignment Calibrator</title>
+  <style>
+    body { margin: 0; padding: 20px; font-family: sans-serif; background: #1a1a1a; color: #fff; }
+    #controls {
+      position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.92);
+      padding: 16px; border-radius: 12px; z-index: 9999; border: 2px solid #C5A059;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 14px;
+    }
+    .ctrl-row { margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .ctrl-row label { width: 80px; font-weight: bold; color: #f4e5b0; }
+    .ctrl-row input[type="number"] { width: 65px; padding: 4px 6px; font-size: 14px; background: #333; color: #fff; border: 1px solid #666; border-radius: 4px; }
+    .img-container {
+      position: relative; width: 916px; height: 1252px; margin: 0 auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5); background: #fff;
+    }
+    .card-img { width: 916px; height: 1252px; display: block; }
+    .overlay-val {
+      position: absolute;
+      transform: translate(-50%, -50%) rotate(-0.3deg);
+      font-family: 'Kalam', 'Caveat', cursive, sans-serif;
+      font-weight: bold;
+      color: #0d3868;
+      font-size: 22px;
+      line-height: 1;
+      pointer-events: none;
+      background: rgba(255, 255, 0, 0.35); /* highlight to see exact bounding box */
+      border: 1px dashed red;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Kalam:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="controls">
+    <h3 style="margin-top:0; color:#C5A059;">Calibrate Card 1 Ezan</h3>
+    <div class="ctrl-row">
+      <label>1. Darees:</label>
+      X: <input type="number" id="x1" value="237">
+      Y: <input type="number" id="y1" value="889">
+      <span id="pct1" style="font-size:11px;color:#aaa;"></span>
+    </div>
+    <div class="ctrl-row">
+      <label>2. Zafaf:</label>
+      X: <input type="number" id="x2" value="397">
+      Y: <input type="number" id="y2" value="889">
+      <span id="pct2" style="font-size:11px;color:#aaa;"></span>
+    </div>
+    <div class="ctrl-row">
+      <label>3. Nikah:</label>
+      X: <input type="number" id="x3" value="567">
+      Y: <input type="number" id="y3" value="889">
+      <span id="pct3" style="font-size:11px;color:#aaa;"></span>
+    </div>
+    <button id="copyBtn" style="width:100%; padding:8px; background:#C5A059; color:#222; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">Copy CSS & Canvas JS</button>
+    <div id="output" style="margin-top:10px; font-family:monospace; font-size:11px; white-space:pre-wrap; max-height:120px; overflow:auto;"></div>
+  </div>
+
+  <div class="img-container" id="container">
+    <img src="Final_Gujarati_v1.jpeg" class="card-img" id="bgImg">
+    <div class="overlay-val" id="val1">All</div>
+    <div class="overlay-val" id="val2">All</div>
+    <div class="overlay-val" id="val3">All</div>
+  </div>
+
+  <script>
+    const x1 = document.getElementById('x1'), y1 = document.getElementById('y1');
+    const x2 = document.getElementById('x2'), y2 = document.getElementById('y2');
+    const x3 = document.getElementById('x3'), y3 = document.getElementById('y3');
+    const v1 = document.getElementById('val1'), v2 = document.getElementById('val2'), v3 = document.getElementById('val3');
+    const pct1 = document.getElementById('pct1'), pct2 = document.getElementById('pct2'), pct3 = document.getElementById('pct3');
+    const out = document.getElementById('output');
+
+    function update() {
+      v1.style.left = x1.value + 'px'; v1.style.top = y1.value + 'px';
+      v2.style.left = x2.value + 'px'; v2.style.top = y2.value + 'px';
+      v3.style.left = x3.value + 'px'; v3.style.top = y3.value + 'px';
+
+      const p1x = ((x1.value / 916) * 100).toFixed(1);
+      const p1y = ((y1.value / 1252) * 100).toFixed(1);
+      const p2x = ((x2.value / 916) * 100).toFixed(1);
+      const p2y = ((y2.value / 1252) * 100).toFixed(1);
+      const p3x = ((x3.value / 916) * 100).toFixed(1);
+      const p3y = ((y3.value / 1252) * 100).toFixed(1);
+
+      pct1.textContent = `${p1x}%, ${p1y}%`;
+      pct2.textContent = `${p2x}%, ${p2y}%`;
+      pct3.textContent = `${p3x}%, ${p3y}%`;
+
+      out.textContent = 
+`CSS:
+.g1-izn-darees { left: ${p1x}%; top: ${p1y}%; }
+.g1-izn-zafaf  { left: ${p2x}%; top: ${p2y}%; }
+.g1-izn-nikaah { left: ${p3x}%; top: ${p3y}%; }
+
+Canvas:
+drawIzn(weddingIzn.darees, ${x1.value}, ${y1.value}, 21);
+drawIzn(weddingIzn.zafaf,  ${x2.value}, ${y2.value}, 21);
+drawIzn(weddingIzn.nikaah, ${x3.value}, ${y3.value}, 21);`;
+    }
+
+    [x1, y1, x2, y2, x3, y3].forEach(input => input.addEventListener('input', update));
+    update();
+
+    // Also allow clicking on the image container to position the currently active or closest item
+    const container = document.getElementById('container');
+    container.addEventListener('click', (e) => {
+      const rect = container.getBoundingClientRect();
+      const clickX = Math.round(e.clientX - rect.left);
+      const clickY = Math.round(e.clientY - rect.top);
+      if (clickX < 360) {
+        x1.value = clickX; y1.value = clickY;
+      } else if (clickX < 600) {
+        x2.value = clickX; y2.value = clickY;
+      } else {
+        x3.value = clickX; y3.value = clickY;
+      }
+      update();
+    });
+  </script>
+</body>
+</html>
