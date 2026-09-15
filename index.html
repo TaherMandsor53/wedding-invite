@@ -1139,6 +1139,12 @@
     }
   </style>
   <script src="cards_data.js"></script>
+  <script src="jspdf.umd.min.js"></script>
+  <script>
+    if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
+    }
+  </script>
 </head>
 <body>
 
@@ -1529,6 +1535,25 @@
           <div class="card-relative-container" id="containerEng1">
             <img src="Final_English_v1.jpeg" alt="Wedding Invitation Floral Cover Card" id="imgEng1">
           </div>
+
+          <div class="card-bottom-actions">
+            <button class="btn-big-download" id="btnDownloadEng1">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Invitation Card (PDF)
+            </button>
+            <div class="card-reading-helper">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Downloads all 3 cards as a 3-page PDF to send to invitees.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1537,6 +1562,25 @@
         <div class="card-display-wrapper">
           <div class="card-relative-container" id="containerEng2">
             <img src="Final_English_v2.jpeg" alt="Husain weds Ummehani English Invitation Card" id="imgEng2">
+          </div>
+
+          <div class="card-bottom-actions">
+            <button class="btn-big-download" id="btnDownloadEng2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Invitation Card (PDF)
+            </button>
+            <div class="card-reading-helper">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Downloads all 3 cards as a 3-page PDF to send to invitees.
+            </div>
           </div>
         </div>
       </div>
@@ -1560,7 +1604,7 @@
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Download Invitation Card
+              Download Invitation Card (PDF)
             </button>
             <div class="card-reading-helper">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1568,7 +1612,7 @@
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              Downloads all 3 cards as a single combined image to send to invitees.
+              Downloads all 3 cards as a 3-page PDF to send to invitees.
             </div>
           </div>
         </div>
@@ -2027,7 +2071,7 @@
               ctx.restore();
             }
 
-            // English Complete 3-Page Combined Card (Cover + Invitation + Programme with Invitees)
+            // English Complete 3-Page Separate Cards PDF (Cover + Invitation + Programme with Invitees)
             if (type === 'eng3' || type === 'eng1' || type === 'eng2') {
               const [img1, img2, img3] = await Promise.all([
                 loadCardImg('eng1', 'imgEng1'),
@@ -2041,38 +2085,98 @@
 
               const targetWidth = 1192;
               const pageHeight = 1600;
-              const totalHeight = pageHeight * 3;
 
-              const canvas = document.createElement('canvas');
-              canvas.width = targetWidth;
-              canvas.height = totalHeight;
-              const ctx = canvas.getContext('2d');
+              // Helper to draw a single card onto a dedicated 1192x1600 canvas
+              function createPageCanvas(img, drawExtrasFn) {
+                const pageCanvas = document.createElement('canvas');
+                pageCanvas.width = targetWidth;
+                pageCanvas.height = pageHeight;
+                const pCtx = pageCanvas.getContext('2d');
 
-              // Warm background matching cards
-              ctx.fillStyle = '#FAF8F5';
-              ctx.fillRect(0, 0, targetWidth, totalHeight);
+                // Warm background matching cards
+                pCtx.fillStyle = '#FAF8F5';
+                pCtx.fillRect(0, 0, targetWidth, pageHeight);
+
+                // Center card horizontally if width differs
+                const x = Math.round((targetWidth - img.width) / 2);
+                pCtx.drawImage(img, x, 0, img.width, pageHeight);
+
+                if (drawExtrasFn) {
+                  drawExtrasFn(pCtx);
+                }
+                return pageCanvas;
+              }
 
               // 1. Page 1: Cover Card
-              const x1 = Math.round((targetWidth - img1.width) / 2);
-              ctx.drawImage(img1, x1, 0, img1.width, pageHeight);
+              const c1 = createPageCanvas(img1);
+              const page1Data = c1.toDataURL('image/jpeg', 0.94);
 
               // 2. Page 2: Invitation Card
-              const x2 = Math.round((targetWidth - img2.width) / 2);
-              ctx.drawImage(img2, x2, pageHeight, img2.width, pageHeight);
+              const c2 = createPageCanvas(img2);
+              const page2Data = c2.toDataURL('image/jpeg', 0.94);
 
-              // 3. Page 3: Programme Card
-              const x3 = Math.round((targetWidth - img3.width) / 2);
-              ctx.drawImage(img3, x3, pageHeight * 2, img3.width, pageHeight);
+              // 3. Page 3: Programme Card with Personalized Invitees
+              const c3 = createPageCanvas(img3, (pCtx) => {
+                drawIznOn(pCtx, weddingIzn.darees, 666, 782, 23);
+                drawIznOn(pCtx, weddingIzn.zafaf, 420, 1250, 23);
+                drawIznOn(pCtx, weddingIzn.nikaah, 886, 1245, 23);
+              });
+              const page3Data = c3.toDataURL('image/jpeg', 0.94);
 
-              // Personalized Invitees on Page 3 (offset: pageHeight * 2 = 3200)
-              const yOff = pageHeight * 2;
-              drawIznOn(ctx, weddingIzn.darees, 666, yOff + 782, 23);
-              drawIznOn(ctx, weddingIzn.zafaf, 420, yOff + 1250, 23);
-              drawIznOn(ctx, weddingIzn.nikaah, 886, yOff + 1245, 23);
+              const JsPDF = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : (window.jsPDF || null);
 
-              const filename = `Wedding_Invitation_English_Complete_${sanitized}.png`;
-              exportCanvas(canvas, filename, 'સંપૂર્ણ પત્રિકા ડાઉનલોડ થઈ ગઈ છે! (Complete Invitation Downloaded)');
-              return;
+              if (JsPDF) {
+                const pdf = new JsPDF({
+                  orientation: 'portrait',
+                  unit: 'px',
+                  format: [targetWidth, pageHeight],
+                  hotfixes: ['px_scaling']
+                });
+
+                // Page 1: Cover
+                pdf.addImage(page1Data, 'JPEG', 0, 0, targetWidth, pageHeight, undefined, 'FAST');
+
+                // Page 2: Invitation
+                pdf.addPage([targetWidth, pageHeight], 'portrait');
+                pdf.addImage(page2Data, 'JPEG', 0, 0, targetWidth, pageHeight, undefined, 'FAST');
+
+                // Page 3: Programme
+                pdf.addPage([targetWidth, pageHeight], 'portrait');
+                pdf.addImage(page3Data, 'JPEG', 0, 0, targetWidth, pageHeight, undefined, 'FAST');
+
+                clearTimeout(failsafeTimeout);
+                loadingOverlay.classList.remove('active');
+
+                const filename = `Wedding_Invitation_English_${sanitized}.pdf`;
+                if (pdf.output) {
+                  const blob = pdf.output('blob');
+                  triggerDownloadBlobOrUrl(blob, filename);
+                } else {
+                  pdf.save(filename);
+                }
+
+                showToast('સંપૂર્ણ પત્રિકા પીડીએફ ડાઉનલોડ થઈ ગઈ છે! (Invitation PDF Downloaded)');
+                return;
+              } else {
+                // Fallback: If jsPDF is not available, export as combined canvas image
+                console.warn('jsPDF not available, falling back to combined canvas image');
+                const totalHeight = pageHeight * 3;
+                const canvas = document.createElement('canvas');
+                canvas.width = targetWidth;
+                canvas.height = totalHeight;
+                const ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = '#FAF8F5';
+                ctx.fillRect(0, 0, targetWidth, totalHeight);
+
+                ctx.drawImage(c1, 0, 0);
+                ctx.drawImage(c2, 0, pageHeight);
+                ctx.drawImage(c3, 0, pageHeight * 2);
+
+                const filename = `Wedding_Invitation_English_Complete_${sanitized}.png`;
+                exportCanvas(canvas, filename, 'સંપૂર્ણ પત્રિકા ડાઉનલોડ થઈ ગઈ છે! (Complete Invitation Downloaded)');
+                return;
+              }
             }
 
             // Gujarati Card 1 & Card 2
