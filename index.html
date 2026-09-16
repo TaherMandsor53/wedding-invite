@@ -9,7 +9,7 @@
   <!-- Google Fonts: Handwritten (Kalam, Caveat), Gujarati (Rasa, Noto Sans), Arabic (Amiri), Serif (Playfair) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&family=Dancing+Script:wght@700&family=Kalam:wght@400;700&family=Noto+Sans+Gujarati:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Rasa:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&family=Dancing+Script:wght@700&family=Kalam:wght@400;700&family=Noto+Sans+Gujarati:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Rasa:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
@@ -32,9 +32,10 @@
       --gold-bright: #D4AF37;
       --gold-foil: linear-gradient(135deg, #B8860B 0%, #E6C265 30%, #FFF3B3 50%, #C5A059 70%, #996515 100%);
       
-      /* Realistic Fountain / Ballpoint Pen Inks */
-      --pen-blue-ink: #0d3868;
-      --pen-blue-ink-hover: #08274a;
+      /* Realistic Fountain / Ballpoint Pen Inks (Black Color) */
+      --pen-blue-ink: #111111;
+      --pen-black-ink: #111111;
+      --pen-blue-ink-hover: #000000;
       
       --text-main: #2C1E38;
       --text-muted: #5D4B6D;
@@ -638,9 +639,9 @@
 
     .pen-indicator-bar .pen-text {
       font-family: var(--font-pen);
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--pen-blue-ink);
+      font-size: 18.5px;
+      font-weight: 800;
+      color: var(--pen-black-ink);
     }
 
     /* Section & Subcard View Switching */
@@ -697,18 +698,19 @@
       position: absolute;
       top: 26.85%;
       left: 31.0%;
-      max-width: 60%;
+      max-width: 62%;
       text-align: left;
       transform: translateY(-72%) rotate(-0.3deg);
       transform-origin: left bottom;
       
       font-family: var(--font-pen);
-      font-size: clamp(11px, 3.1cqw, 24px);
-      font-weight: 700;
-      color: var(--pen-blue-ink);
-      letter-spacing: 0.3px;
+      font-size: clamp(16px, 4.3cqw, 33px);
+      font-weight: 800;
+      -webkit-text-stroke: 0.35px #111111;
+      color: var(--pen-black-ink);
+      letter-spacing: 0.4px;
       line-height: 1;
-      text-shadow: 0 0 0.5px rgba(11, 51, 102, 0.45);
+      text-shadow: 0 0 0.5px rgba(0, 0, 0, 0.45);
       
       pointer-events: none;
       user-select: none;
@@ -723,9 +725,9 @@
       transform: translate(-50%, -50%) rotate(-0.3deg);
       font-family: var(--font-pen);
       font-weight: 700;
-      color: var(--pen-blue-ink);
+      color: var(--pen-black-ink);
       line-height: 1;
-      text-shadow: 0 0 0.5px rgba(11, 51, 102, 0.45);
+      text-shadow: 0 0 0.5px rgba(0, 0, 0, 0.4);
       pointer-events: none;
       user-select: none;
       white-space: nowrap;
@@ -2063,8 +2065,8 @@
               ctx.rotate((-0.3 * Math.PI) / 180);
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
-              ctx.fillStyle = '#0d3868';
-              ctx.shadowColor = 'rgba(13, 56, 104, 0.45)';
+              ctx.fillStyle = '#111111';
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
               ctx.shadowBlur = 1;
               ctx.font = `bold ${size}px 'Kalam', 'Caveat', 'Rasa', 'Noto Sans Gujarati', cursive`;
               ctx.fillText(val, 0, 0);
@@ -2208,12 +2210,12 @@
                 ctx.save();
                 ctx.translate(285, 336);
                 ctx.rotate((-0.3 * Math.PI) / 180);
-                ctx.fillStyle = '#0d3868';
-                ctx.shadowColor = 'rgba(13, 56, 104, 0.45)';
+                ctx.fillStyle = '#111111';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
                 ctx.shadowBlur = 1;
-                let fontSize = 28;
-                if (nameToInscribe.length > 25) fontSize = 24;
-                if (nameToInscribe.length > 35) fontSize = 20;
+                let fontSize = 38;
+                if (nameToInscribe.length > 25) fontSize = 32;
+                if (nameToInscribe.length > 35) fontSize = 26;
                 ctx.font = `bold ${fontSize}px 'Kalam', 'Caveat', 'Rasa', 'Noto Sans Gujarati', cursive`;
                 ctx.textBaseline = 'alphabetic';
                 ctx.fillText(nameToInscribe, 0, 0);
